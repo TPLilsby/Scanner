@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stregkode Scanner</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        #interactive {
+            width: 100%; /* Sætter bredden til 100% af dens forælder */
+            max-width: 600px; /* Øg den maksimale bredde */
+            height: 400px; /* Sæt en fast højde for bedre visning */
+            border: 2px solid #007BFF;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        input, button {
+            width: 30%; /* Juster også bredden her for konsistens */
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #007BFF;
+            border-radius: 5px;
+        }
+        input:focus, button:focus {
+            outline: none;
+            border-color: #0056b3;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Stregkode Scanner</h1>
+    <div id="interactive" class="viewport"></div>
+    <input type="text" id="urlInput" placeholder="Indtast URL for stregkode">
+    <button id="submitUrl">Gem URL</button>
+    <button id="openUrl" style="display: none;">Åbn URL</button>
+    <p id="message"></p>
+
+    <script>
+        const urlInput = document.getElementById('urlInput');
+        const message = document.getElementById('message');
+        const openUrlButton = document.getElementById('openUrl');
+        let lastDetectedCode = "";
+
+        Quagga.init({
+            inputStream: {
+                name: "Live",
+                type: "LiveStream",
+                target: document.querySelector('#interactive'),
+                constraints: {
+                    facingMode: "environment"
+                }
+            },
+            decoder: {
+                readers: ["code_128_reader", "ean_reader", "ean_8_reader"]
+            }
+        }, (err) => {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            console.log("Quagga initialiseret");
+            Quagga.start();
+        });
+
+        Quagga.onDetected((data) => {
+            const code = data.codeResult.code;
+            if (code !== lastDetectedCode) {
+                lastDetectedCode = code;
+                console.log("Stregkode fundet:", code);
+                checkCode(code);
+            }
+        });
+
+        function checkCode(code) {
+            const storedUrls = JSON.parse(localStorage.getItem('urls')) || {};
+            console.log("Gemte URLs:", storedUrls);
+            if (storedUrls[code]) {
+                openUrlButton.style.display = "block"; // Vis knappen for at åbne URL
+                openUrlButton.onclick = () => window.open(storedUrls[code], '_blank');
+                message.textContent = "Stregkode fundet! Klik for at åbne URL.";
+            } else {
+                message.textContent = "Stregkode ikke fundet. Indtast URL.";
+                urlInput.value = "";
+                openUrlButton.style.display = "none"; // Skjul knappen
+            }
+        }
+
+        document.getElementById('submitUrl').addEventListener('click', () => {
+            const url = urlInput.value;
+
+            if (lastDetectedCode && url) {
+                const storedUrls = JSON.parse(localStorage.getItem('urls')) || {};
+                storedUrls[lastDetectedCode] = url;
+                localStorage.setItem('urls', JSON.stringify(storedUrls));
+                message.textContent = "URL gemt for stregkode: " + lastDetectedCode;
+                urlInput.value = "";
+            } else {
+                message.textContent = "Ingen stregkode fundet eller URL mangler!";
+            }
+        });
+    </script>
+</body>
+</html>
