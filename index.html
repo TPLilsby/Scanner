@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stregkode Scanner</title>
-    <!-- Import Quagga for barcode scanning -->
+    <!-- Importing Quagga to read barcode -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
-    <!-- Import Supabase for database interaction -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
     <!-- CSS styling -->
@@ -54,7 +53,7 @@
     <!-- HTML layout -->
     <h1>Stregkode Scanner</h1>
 
-    <!-- The container for the camera stream -->
+    <!-- Container for the camera stream -->
     <div id="interactive" class="viewport"></div>
 
     <!-- Input field for the URL -->
@@ -63,22 +62,21 @@
     <!-- Button to submit the URL -->
     <button id="submitUrl">Gem URL</button>
 
-    <!-- Hidden button to open URL, shown when barcode is matched -->
-    <button id="openUrl" style="display: none;">Åbn Mappe</button>
+    <!-- Hidden button to open url, shown when barcode is matched -->
+    <button id="openUrl" style="display: none;">Åbn URL</button>
     <p id="message"></p>
 
-    <!-- JavaScript for barcode detection and URL handling -->
+    <!-- JavaScript for barcode detection and Supabase integration -->
     <script>
-        // Supabase setup: replace with your own Supabase URL and API key
-        const supabaseUrl = 'https://your-supabase-url.supabase.co';  // Replace with your Supabase URL
-        const supabaseKey = 'your-supabase-key';  // Replace with your Supabase key
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
-        // Reference to HTML elements
         const urlInput = document.getElementById('urlInput'); // Reference to the URL input field
         const message = document.getElementById('message'); // Reference to the message display element
         const openUrlButton = document.getElementById('openUrl'); // Reference to the hidden button for opening the URL
         let lastDetectedCode = ""; // Variable to store the last detected barcode
+
+        // Supabase setup: replace with your own Supabase URL and API key
+        const supabaseUrl = 'https://rztyyyxrvpybpmeksxri.supabase.co';  // Replace with your Supabase URL
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ6dHl5eXhydnB5YnBtZWtzeHJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjgyOTAwNTksImV4cCI6MjA0Mzg2NjA1OX0.EfrwFshPC9bi00TuVzP33TxPCUoNOcA3yz9pBFHav3c';  // Replace with your Supabase key
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey); // Initialize Supabase client
 
         // Initialize Quagga to start the camera and scan barcodes
         Quagga.init({
@@ -101,40 +99,39 @@
             console.log("Quagga initialiseret"); // Log that Quagga is initialized
             Quagga.start(); // Start the barcode scanner
         });
-        
-        // Detects a barcode and triggers the checkCodeOnline function
-        Quagga.onDetected(async (data) => {
+
+        // Detect a barcode and call checkCode function
+        Quagga.onDetected((data) => {
             const code = data.codeResult.code;
 
             // Check if the detected code is new (not the same as the last one)
             if (code !== lastDetectedCode) {
                 lastDetectedCode = code; // Update the last detected barcode
                 console.log("Stregkode fundet:", code);
-                await checkCodeOnline(code); // Call checkCodeOnline to handle the detected code
+                checkCode(code); // Call checkCode to handle the detected code
             }
         });
 
         // Function to check if the barcode has a matching URL in Supabase
-        async function checkCodeOnline(code) {
-            // Query Supabase to see if the barcode is already linked to a URL
-            let { data, error } = await supabase
-                .from('barcodes')  // 'barcodes' is the table in Supabase where barcode-URL pairs are stored
-                .select('*')
-                .eq('barcode', code);  // Check if the scanned barcode exists
+        async function checkCode(code) {
+            const { data, error } = await supabase
+                .from('barcodes')
+                .select('url')
+                .eq('barcode', code)
+                .single(); // Fetch the URL from Supabase for the scanned barcode
 
             if (error) {
-                console.error("Fejl ved forespørgsel til Supabase", error);
-                message.textContent = "Fejl ved forespørgsel til serveren.";
+                console.error("Fejl ved hentning af data fra Supabase:", error);
+                message.textContent = "Fejl ved hentning af stregkode.";
                 return;
             }
 
-            if (data && data.length > 0) {
-                // If a match is found, display the button to open the associated URL
-                openUrlButton.style.display = "block"; 
-                openUrlButton.onclick = () => window.open(data[0].url, '_blank');  // Open the URL in a new tab
+            // Check if a matching URL is found
+            if (data) {
+                openUrlButton.style.display = "block"; // Show button to open the URL
+                openUrlButton.onclick = () => window.open(data.url, '_blank'); // Open the URL in a new tab when clicked
                 message.textContent = "Stregkode fundet! Klik for at åbne URL.";
             } else {
-                // If no matching URL, prompt the user to enter one
                 message.textContent = "Stregkode ikke fundet. Indtast URL.";
                 urlInput.value = ""; // Clear the input field
                 openUrlButton.style.display = "none"; // Hide the button
@@ -147,19 +144,17 @@
 
             // Ensure both a barcode and URL are available
             if (lastDetectedCode && url) {
-                // Insert the barcode and URL into the 'barcodes' table in Supabase
-                const { data, error } = await supabase
+                const { error } = await supabase
                     .from('barcodes')
-                    .insert([{ barcode: lastDetectedCode, url: url }]);
+                    .insert({ barcode: lastDetectedCode, url: url }); // Insert the barcode and URL into Supabase
 
                 if (error) {
-                    console.error("Fejl ved indsættelse i Supabase", error);
-                    message.textContent = "Fejl ved gemning af stregkode.";
+                    console.error("Fejl ved indsættelse i Supabase:", error);
+                    message.textContent = "Fejl ved lagring af URL.";
                     return;
                 }
 
-                // Inform the user that the URL has been saved
-                message.textContent = "URL gemt for stregkode: " + lastDetectedCode;
+                message.textContent = "URL gemt for stregkode: " + lastDetectedCode; // Inform the user that the URL is saved
                 urlInput.value = ""; // Clear the input field
             } else {
                 message.textContent = "Ingen stregkode fundet eller URL mangler!"; // Error message if barcode or URL is missing
