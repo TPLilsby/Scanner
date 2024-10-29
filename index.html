@@ -46,6 +46,43 @@
         button:hover {
             background-color: #0056b3;
         }
+        
+        /* CSS for the 'Om' bubble link */
+        .aboutLink {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 20px; /* Position in the top-right corner */
+            right: 20px;
+            width: 60px; /* Circular size */
+            height: 60px;
+            background-color: #007BFF; /* Button color */
+            color: white;
+            border-radius: 50%; /* Fully circular */
+            font-size: 18px;
+            text-decoration: none;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, background-color 0.2s ease;
+            z-index: 10; /* Ensures it’s on top */
+        }
+
+        /* Pop-out hover effect */
+        .aboutLink:hover {
+            background-color: #0056b3;
+            transform: scale(1.1); /* Slightly enlarge on hover */
+        }
+
+        /* Subtle pulsing animation */
+        @keyframes popOut {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        .aboutLink {
+            animation: popOut 2s ease-in-out infinite; /* Continuous pulsing */
+        }
     </style>
 </head>
 <body>
@@ -64,6 +101,9 @@
     <!-- Hidden button to open url, shown when barcode is matched -->
     <button id="openUrl" style="display: none;">Åbn URL</button>
     <p id="message"></p>
+
+    <!-- Link to the about page -->
+    <a href="about.html" class="aboutLink">Om</a>
 
     <!-- JavaScript for barcode detection and URL handling -->
     <script>
@@ -142,5 +182,3 @@
     </script>
 </body>
 </html>
-
-<!-- Din mor -->

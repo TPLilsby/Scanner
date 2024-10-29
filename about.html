@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Om Stregkode Scanneren</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Grundlæggende styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .about-container {
+            max-width: 900px; /* Øget max-bredde for at give mere plads */
+            background: white;
+            padding: 40px; /* Øget padding for mere indvendig afstand */
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            color: #007BFF;
+            text-align: center;
+        }
+
+        p {
+            line-height: 1.6;
+        }
+
+        /* Visuelt effekt på sektionerne */
+        .section {
+            margin-top: 30px; /* Øget margin mellem sektioner */
+            padding: 20px;
+            border-left: 5px solid #007BFF;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+
+        .section h2 {
+            margin-top: 0;
+            font-size: 1.5em;
+        }
+
+        .workflow-step {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+
+        .step-icon {
+            width: 50px; /* Justeret størrelse for ikon */
+            height: 50px;
+            background: #007BFF;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%; /* Sørg for, at cirklen er 100% rund */
+            font-weight: bold;
+            font-size: 1.5em; /* Justeret størrelse for ikon tekst */
+            line-height: 50px; /* Centrerer teksten vertikalt */
+        }
+    </style>     
+</head>
+<body>
+
+<div class="about-container">
+    <h1>Om Stregkode Scanneren</h1>
+
+    <div class="section">
+        <h2>Introduktion</h2>
+        <p>Dette projekt blev udviklet på baggrund af en anmodning fra en lærer, som ønskede en enkel måde for sine elever at åbne mapper delt via OneDrive. Vores scanner gør det muligt for brugere hurtigt at scanne stregkoder og gemme URL'er, så de nemt kan få adgang til delte ressourcer.</p>
+    </div>
+
+    <div class="section">
+        <h2>Workflow</h2>
+
+        <div class="workflow-step">
+            <div class="step-icon">1</div>
+            <div>
+                <h3>Scanning af stregkode</h3>
+                <p>Kameraet aktiveres og scanner automatisk, når en stregkode vises foran linsen. Stregkoden registreres og sammenlignes med tidligere gemte URL'er.</p>
+            </div>
+        </div>
+
+        <div class="workflow-step">
+            <div class="step-icon">2</div>
+            <div>
+                <h3>Indtast URL</h3>
+                <p>Hvis stregkoden ikke findes i systemet, bliver brugeren bedt om at tilføje en URL. Denne gemmes derefter til fremtidig brug.</p>
+            </div>
+        </div>
+
+        <div class="workflow-step">
+            <div class="step-icon">3</div>
+            <div>
+                <h3>Åbning af URL</h3>
+                <p>Når stregkoden matches en URL, kan brugeren straks åbne linket i en ny fane ved at klikke på knappen, som bliver synlig.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Funktioner</h2>
+        <p>Vores scanner er hurtig og brugervenlig. Den gør det muligt for elever at scanne stregkoder og få adgang til delte mapper uden besvær. Systemet er designet til at være intuitivt, hvilket gør det nemt for alle at bruge.</p>
+    </div>
+</div>
+
+</body>
+</html>
